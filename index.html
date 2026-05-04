@@ -10,10 +10,59 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #F2F4F7;
             color: #111827;
-            padding: 40px 20px;
             min-height: 100vh;
+            display: flex;
         }
-        .container { max-width: 680px; margin: 0 auto; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 180px;
+            min-height: 100vh;
+            background: white;
+            border-right: 1px solid #E5E7EB;
+            padding: 32px 16px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #9DA3AE;
+            margin-bottom: 16px;
+            padding-left: 12px;
+        }
+        .month-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .month-btn:hover { background: #F3F4F6; color: #111827; }
+        .month-btn.active { background: #EFF6FF; color: #2563EB; font-weight: 600; }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            padding: 40px 32px;
+            max-width: 740px;
+        }
+
+        .report { display: none; }
+        .report.active { display: block; }
 
         .header-card {
             background: white;
@@ -36,17 +85,8 @@
             color: #111827;
             margin-bottom: 28px;
         }
-        .csat-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 14px;
-        }
-        .csat-score {
-            font-size: 64px;
-            font-weight: 800;
-            line-height: 1;
-            color: #111827;
-        }
+        .csat-container { display: flex; align-items: flex-end; gap: 14px; }
+        .csat-score { font-size: 64px; font-weight: 800; line-height: 1; color: #111827; }
         .csat-meta { padding-bottom: 8px; }
         .csat-label { font-size: 13px; color: #9DA3AE; margin-bottom: 4px; }
         .csat-trend-up { font-size: 14px; font-weight: 600; color: #16A34A; }
@@ -91,16 +131,8 @@
             color: #6B7280;
             flex-shrink: 0;
         }
-        .reason-text {
-            font-size: 15px;
-            font-weight: 500;
-            color: #111827;
-            flex: 1;
-        }
-        .reason-links {
-            display: flex;
-            gap: 6px;
-        }
+        .reason-text { font-size: 15px; font-weight: 500; color: #111827; flex: 1; }
+        .reason-links { display: flex; gap: 6px; }
         .reason-link {
             font-size: 12px;
             font-weight: 500;
@@ -114,12 +146,7 @@
 
         .issue-block { margin-bottom: 24px; }
         .issue-block:last-child { margin-bottom: 0; }
-        .issue-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
+        .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .issue-num {
             width: 22px;
             height: 22px;
@@ -136,12 +163,7 @@
         .issue-title { font-size: 15px; font-weight: 600; color: #111827; }
         .issue-subtitle { font-size: 13px; color: #9DA3AE; font-weight: 400; }
 
-        .quotes {
-            padding-left: 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .quotes { padding-left: 32px; display: flex; flex-direction: column; gap: 8px; }
         .quote {
             font-size: 14px;
             color: #4B5563;
@@ -168,118 +190,106 @@
             margin-top: 1px;
         }
         .quote-link:hover { text-decoration: underline; }
-
         .divider { height: 1px; background: #F3F4F6; margin: 20px 0; }
-
-        .footer-card {
-            background: white;
-            border-radius: 20px;
-            padding: 20px 28px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .footer-label { font-size: 14px; color: #6B7280; }
-        .full-report-link {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2563EB;
-            text-decoration: none;
-        }
-        .full-report-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-<div class="container" id="report"></div>
+
+<nav class="sidebar">
+    <div class="sidebar-title">Reports</div>
+    <div id="nav"></div>
+</nav>
+
+<main class="main" id="content"></main>
 
 <script>
-// ─── UPDATE THIS SECTION EACH MONTH ───────────────────────────
-const DATA = {
-  period: "April 2026",
-  timeframe: "13.4 – 30.4",
-  csat: "41.5%",
-  csatTrend: null,       // e.g. "+3.2pp vs. March" — set to null if no comparison
-  csatTrendUp: true,     // true = green arrow, false = red
-  fullReportUrl: "#",    // Replace with actual link to full analysis
+// ─── ADD A NEW MONTH BY ADDING AN ENTRY TO THIS ARRAY ─────────
+const REPORTS = [
+  {
+    period: "April 2026",
+    timeframe: "13.4 – 30.4",
+    csat: "41.5%",
+    csatTrend: null,
+    csatTrendUp: true,
 
-  topReasons: [
-    {
-      text: "Solution didn't work",
-      links: [
-        { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/a62e3203-9e04-4898-af51-a46b598bf592" },
-        { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/83b7c39b-07aa-4211-9c73-7c23e6163851" }
-      ]
-    },
-    {
-      text: "Didn't understand my question",
-      links: [
-        { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/3f8b395e-d6bb-4642-86dc-6c8eb8cfb2f7" },
-        { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/bc8de7db-128b-4db9-86c9-b5eb89e1919e" }
-      ]
-    },
-    {
-      text: "Too much effort",
-      links: [
-        { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/df27c0db-09bf-4ad6-9980-4c0205e95498" },
-        { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/0de87aa9-6304-434e-9c93-04ab4bd2e17a" }
-      ]
-    }
-  ],
+    topReasons: [
+      {
+        text: "Solution didn't work",
+        links: [
+          { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/a62e3203-9e04-4898-af51-a46b598bf592" },
+          { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/83b7c39b-07aa-4211-9c73-7c23e6163851" }
+        ]
+      },
+      {
+        text: "Didn't understand my question",
+        links: [
+          { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/3f8b395e-d6bb-4642-86dc-6c8eb8cfb2f7" },
+          { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/bc8de7db-128b-4db9-86c9-b5eb89e1919e" }
+        ]
+      },
+      {
+        text: "Too much effort",
+        links: [
+          { label: "Example 1", url: "https://bo.wix.com/chatbot-builder/conversations/df27c0db-09bf-4ad6-9980-4c0205e95498" },
+          { label: "Example 2", url: "https://bo.wix.com/chatbot-builder/conversations/0de87aa9-6304-434e-9c93-04ab4bd2e17a" }
+        ]
+      }
+    ],
 
-  topIssues: [
-    {
-      title: "Repetition",
-      subtitle: "stuck on the wrong issue",
-      quotes: [
-        { text: "repeating what was not the issue", url: "https://bo.wix.com/chatbot-builder/conversations/48f27b93-a6e0-4050-a1e1-207d2fe76788" },
-        { text: "have to repeat everything already answered", url: "https://bo.wix.com/chatbot-builder/conversations/7eb2e63e-d0df-464c-bad4-df89d97ec084" }
-      ]
-    },
-    {
-      title: "Bad guidance",
-      subtitle: "steps / settings / links / confusing path",
-      quotes: [
-        { text: "AI told me to go to settings that dont exist", url: "https://bo.wix.com/chatbot-builder/conversations/df545bb2-e845-40d1-ac79-5167e1abdf16" },
-        { text: "repeated questions I had already answered and gave me solutions that I already stated didnt work. Sent me to links that dont exist", url: "https://bo.wix.com/chatbot-builder/conversations/87f55d49-2b2d-42df-bb87-6a2ba63a1854" }
-      ]
-    },
-    {
-      title: "Solutions ineffective",
-      subtitle: "doesn't work / unhelpful",
-      quotes: [
-        { text: "what I need doesnt work and this is really frustrating", url: "https://bo.wix.com/chatbot-builder/conversations/efacf375-e1a7-4a22-8a0a-3bf9b898d841" },
-        { text: "AI kept giving me solutions that did not work when I kept telling them I cant sign in because I am not getting verification code", url: "https://bo.wix.com/chatbot-builder/conversations/2169e4e8-a395-4dd3-877c-1982aee11025" }
-      ]
-    },
-    {
-      title: "Misunderstanding",
-      subtitle: "wrong summary of the problem",
-      quotes: [
-        { text: "You created your own description which is incorrect. I CAN access bodyinmotion. I CANNOT ACCESS two new companies we own.", url: "https://bo.wix.com/chatbot-builder/conversations/68de2afe-eac1-4e49-9601-2e390cb2ffb8" },
-        { text: "I have spent many hours interacting with your chat system. It does not understand my request.", url: "https://bo.wix.com/chatbot-builder/conversations/6708fb25-c545-4d75-b6a4-fda92d4bd976" }
-      ]
-    },
-    {
-      title: "Input limitations",
-      subtitle: "too short / cannot attach files",
-      quotes: [
-        { text: "The chatbot doesnt allow me to put enough characters to describe the issue. It also doesnt let me attach a pdf or document of any kind.", url: "https://bo.wix.com/chatbot-builder/conversations/a75fb6a0-d339-4d1a-b1bc-a9112c6ec8e4" },
-        { text: "You have a limit on characters and when I ask to upload a document I have 3 of the same conversations with a bot who cant help.", url: "https://bo.wix.com/chatbot-builder/conversations/540a4c25-cb06-4783-9ba1-367caa2db2ca" }
-      ]
-    }
-  ]
-};
-// ──────────────────────────────────────────────────────────────
+    topIssues: [
+      {
+        title: "Repetition",
+        subtitle: "stuck on the wrong issue",
+        quotes: [
+          { text: "repeating what was not the issue", url: "https://bo.wix.com/chatbot-builder/conversations/48f27b93-a6e0-4050-a1e1-207d2fe76788" },
+          { text: "have to repeat everything already answered", url: "https://bo.wix.com/chatbot-builder/conversations/7eb2e63e-d0df-464c-bad4-df89d97ec084" }
+        ]
+      },
+      {
+        title: "Bad guidance",
+        subtitle: "steps / settings / links / confusing path",
+        quotes: [
+          { text: "AI told me to go to settings that dont exist", url: "https://bo.wix.com/chatbot-builder/conversations/df545bb2-e845-40d1-ac79-5167e1abdf16" },
+          { text: "repeated questions I had already answered and gave me solutions that I already stated didnt work. Sent me to links that dont exist", url: "https://bo.wix.com/chatbot-builder/conversations/87f55d49-2b2d-42df-bb87-6a2ba63a1854" }
+        ]
+      },
+      {
+        title: "Solutions ineffective",
+        subtitle: "doesn't work / unhelpful",
+        quotes: [
+          { text: "what I need doesnt work and this is really frustrating", url: "https://bo.wix.com/chatbot-builder/conversations/efacf375-e1a7-4a22-8a0a-3bf9b898d841" },
+          { text: "AI kept giving me solutions that did not work when I kept telling them I cant sign in because I am not getting verification code", url: "https://bo.wix.com/chatbot-builder/conversations/2169e4e8-a395-4dd3-877c-1982aee11025" }
+        ]
+      },
+      {
+        title: "Misunderstanding",
+        subtitle: "wrong summary of the problem",
+        quotes: [
+          { text: "You created your own description which is incorrect. I CAN access bodyinmotion. I CANNOT ACCESS two new companies we own.", url: "https://bo.wix.com/chatbot-builder/conversations/68de2afe-eac1-4e49-9601-2e390cb2ffb8" },
+          { text: "I have spent many hours interacting with your chat system. It does not understand my request.", url: "https://bo.wix.com/chatbot-builder/conversations/6708fb25-c545-4d75-b6a4-fda92d4bd976" }
+        ]
+      },
+      {
+        title: "Input limitations",
+        subtitle: "too short / cannot attach files",
+        quotes: [
+          { text: "The chatbot doesnt allow me to put enough characters to describe the issue. It also doesnt let me attach a pdf or document of any kind.", url: "https://bo.wix.com/chatbot-builder/conversations/a75fb6a0-d339-4d1a-b1bc-a9112c6ec8e4" },
+          { text: "You have a limit on characters and when I ask to upload a document I have 3 of the same conversations with a bot who cant help.", url: "https://bo.wix.com/chatbot-builder/conversations/540a4c25-cb06-4783-9ba1-367caa2db2ca" }
+        ]
+      }
+    ]
+  }
 
-function render() {
-  const container = document.getElementById('report');
+  // ── PASTE NEXT MONTH HERE, SEPARATED BY A COMMA ──
+];
+// ──────────────────────────────────────────────────
 
-  const trendHtml = DATA.csatTrend
-    ? `<div class="${DATA.csatTrendUp ? 'csat-trend-up' : 'csat-trend-down'}">${DATA.csatTrend}</div>`
+function renderReport(data) {
+  const trendHtml = data.csatTrend
+    ? `<div class="${data.csatTrendUp ? 'csat-trend-up' : 'csat-trend-down'}">${data.csatTrend}</div>`
     : '';
 
-  const reasonsHtml = DATA.topReasons.map((r, i) => `
+  const reasonsHtml = data.topReasons.map((r, i) => `
     <div class="reason-item">
       <div class="reason-num">${i + 1}</div>
       <div class="reason-text">${r.text}</div>
@@ -289,7 +299,7 @@ function render() {
     </div>
   `).join('');
 
-  const issuesHtml = DATA.topIssues.map((issue, i) => `
+  const issuesHtml = data.topIssues.map((issue, i) => `
     <div class="issue-block">
       <div class="issue-header">
         <div class="issue-num">${i + 1}</div>
@@ -307,40 +317,59 @@ function render() {
         `).join('')}
       </div>
     </div>
-    ${i < DATA.topIssues.length - 1 ? '<div class="divider"></div>' : ''}
+    ${i < data.topIssues.length - 1 ? '<div class="divider"></div>' : ''}
   `).join('');
 
-  container.innerHTML = `
+  return `
     <div class="header-card">
-      <div class="report-meta">Helpmate User Feedback · ${DATA.timeframe}</div>
-      <div class="report-title">${DATA.period}</div>
+      <div class="report-meta">Helpmate User Feedback · ${data.timeframe}</div>
+      <div class="report-title">${data.period}</div>
       <div class="csat-container">
-        <div class="csat-score">${DATA.csat}</div>
+        <div class="csat-score">${data.csat}</div>
         <div class="csat-meta">
           <div class="csat-label">Helpmate CSAT</div>
           ${trendHtml}
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">Top reasons for bad score</div>
       ${reasonsHtml}
     </div>
-
     <div class="card">
       <div class="card-title">Top issues from free text</div>
       ${issuesHtml}
     </div>
-
-    <div class="footer-card">
-      <span class="footer-label">Want the full breakdown?</span>
-      <a href="${DATA.fullReportUrl}" class="full-report-link">View full analysis →</a>
-    </div>
   `;
 }
 
-render();
+function init() {
+  const nav = document.getElementById('nav');
+  const content = document.getElementById('content');
+
+  REPORTS.forEach((report, i) => {
+    // Nav button
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (i === REPORTS.length - 1 ? ' active' : '');
+    btn.textContent = report.period;
+    btn.onclick = () => {
+      document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.report').forEach(r => r.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('report-' + i).classList.add('active');
+    };
+    nav.appendChild(btn);
+
+    // Report section
+    const section = document.createElement('div');
+    section.className = 'report' + (i === REPORTS.length - 1 ? ' active' : '');
+    section.id = 'report-' + i;
+    section.innerHTML = renderReport(report);
+    content.appendChild(section);
+  });
+}
+
+init();
 </script>
 </body>
 </html>
