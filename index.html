@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpmate Feedback Report</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F2F4F7;
+            color: #111827;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 680px; margin: 0 auto; }
+
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 36px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .report-meta {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9DA3AE;
+            margin-bottom: 6px;
+        }
+        .report-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 28px;
+        }
+        .csat-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+        }
+        .csat-score {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1;
+            color: #111827;
+        }
+        .csat-meta { padding-bottom: 8px; }
+        .csat-label { font-size: 13px; color: #9DA3AE; margin-bottom: 4px; }
+        .csat-trend-up { font-size: 14px; font-weight: 600; color: #16A34A; }
+        .csat-trend-down { font-size: 14px; font-weight: 600; color: #DC2626; }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #9DA3AE;
+            margin-bottom: 18px;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 16px;
+            background: #F9FAFB;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .reason-item:last-child { margin-bottom: 0; }
+        .reason-num {
+            width: 24px;
+            height: 24px;
+            background: #E5E7EB;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #6B7280;
+            flex-shrink: 0;
+        }
+        .reason-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #111827;
+            flex: 1;
+        }
+        .reason-links {
+            display: flex;
+            gap: 6px;
+        }
+        .reason-link {
+            font-size: 12px;
+            font-weight: 500;
+            color: #2563EB;
+            text-decoration: none;
+            background: #EFF6FF;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .reason-link:hover { background: #DBEAFE; }
+
+        .issue-block { margin-bottom: 24px; }
+        .issue-block:last-child { margin-bottom: 0; }
+        .issue-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .issue-num {
+            width: 22px;
+            height: 22px;
+            background: #FEE2E2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #DC2626;
+            flex-shrink: 0;
+        }
+        .issue-title { font-size: 15px; font-weight: 600; color: #111827; }
+        .issue-subtitle { font-size: 13px; color: #9DA3AE; font-weight: 400; }
+
+        .quotes {
+            padding-left: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quote {
+            font-size: 14px;
+            color: #4B5563;
+            font-style: italic;
+            padding: 10px 14px;
+            background: #F9FAFB;
+            border-left: 3px solid #E5E7EB;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.5;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .quote-text { flex: 1; }
+        .quote-link {
+            font-size: 12px;
+            font-weight: 500;
+            color: #2563EB;
+            text-decoration: none;
+            white-space: nowrap;
+            font-style: normal;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .quote-link:hover { text-decoration: underline; }
+
+        .divider { height: 1px; background: #F3F4F6; margin: 20px 0; }
+
+        .footer-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-label { font-size: 14px; color: #6B7280; }
+        .full-report-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2563EB;
+            text-decoration: none;
+        }
+        .full-report-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container" id="report"></div>
+
+<script>
+// ─── UPDATE THIS SECTION EACH MONTH ───────────────────────────
+const DATA = {
+  period: "April 2026",
+  timeframe: "13.4 – 30.4",
+  csat: "41.5%",
+  csatTrend: null,       // e.g. "+3.2pp vs. March" — set to null if no comparison
+  csatTrendUp: true,     // true = green arrow, false = red
+  fullReportUrl: "#",    // Replace with actual link to full analysis
+
+  topReasons: [
+    {
+      text: "Solution didn't work",
+      links: [
+        { label: "Example 1", url: "#" },
+        { label: "Example 2", url: "#" }
+      ]
+    },
+    {
+      text: "Didn't understand my question",
+      links: [
+        { label: "Example 1", url: "#" },
+        { label: "Example 2", url: "#" }
+      ]
+    },
+    {
+      text: "Too much effort",
+      links: [
+        { label: "Example 1", url: "#" },
+        { label: "Example 2", url: "#" }
+      ]
+    }
+  ],
+
+  topIssues: [
+    {
+      title: "Repetition",
+      subtitle: "stuck on the wrong issue",
+      quotes: [
+        { text: "repeating what was not the issue", url: "#" },
+        { text: "have to repeat everything already answered", url: "#" }
+      ]
+    },
+    {
+      title: "Bad guidance",
+      subtitle: "steps / settings / links / confusing path",
+      quotes: [
+        { text: "AI told me to go to settings that dont exist", url: "#" },
+        { text: "repeated questions I had already answered and gave me solutions that I already stated didnt work. Sent me to links that dont exist", url: "#" }
+      ]
+    },
+    {
+      title: "Solutions ineffective",
+      subtitle: "doesn't work / unhelpful",
+      quotes: [
+        { text: "what I need doesnt work and this is really frustrating", url: "#" },
+        { text: "AI kept giving me solutions that did not work when I kept telling them I cant sign in because I am not getting verification code", url: "#" }
+      ]
+    },
+    {
+      title: "Misunderstanding",
+      subtitle: "wrong summary of the problem",
+      quotes: [
+        { text: "You created your own description which is incorrect. I CAN access bodyinmotion. I CANNOT ACCESS two new companies we own.", url: "#" },
+        { text: "I have spent many hours interacting with your chat system. It does not understand my request.", url: "#" }
+      ]
+    },
+    {
+      title: "Input limitations",
+      subtitle: "too short / cannot attach files",
+      quotes: [
+        { text: "The chatbot doesnt allow me to put enough characters to describe the issue. It also doesnt let me attach a pdf or document of any kind.", url: "#" },
+        { text: "You have a limit on characters and when I ask to upload a document I have 3 of the same conversations with a bot who cant help.", url: "#" }
+      ]
+    }
+  ]
+};
+// ──────────────────────────────────────────────────────────────
+
+function render() {
+  const container = document.getElementById('report');
+
+  const trendHtml = DATA.csatTrend
+    ? `<div class="${DATA.csatTrendUp ? 'csat-trend-up' : 'csat-trend-down'}">${DATA.csatTrend}</div>`
+    : '';
+
+  const reasonsHtml = DATA.topReasons.map((r, i) => `
+    <div class="reason-item">
+      <div class="reason-num">${i + 1}</div>
+      <div class="reason-text">${r.text}</div>
+      <div class="reason-links">
+        ${r.links.map(l => `<a href="${l.url}" target="_blank" class="reason-link">${l.label}</a>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const issuesHtml = DATA.topIssues.map((issue, i) => `
+    <div class="issue-block">
+      <div class="issue-header">
+        <div class="issue-num">${i + 1}</div>
+        <div>
+          <span class="issue-title">${issue.title}</span>
+          ${issue.subtitle ? `<span class="issue-subtitle"> — ${issue.subtitle}</span>` : ''}
+        </div>
+      </div>
+      <div class="quotes">
+        ${issue.quotes.map(q => `
+          <div class="quote">
+            <span class="quote-text">"${q.text}"</span>
+            ${q.url ? `<a href="${q.url}" target="_blank" class="quote-link">View conversation ↗</a>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ${i < DATA.topIssues.length - 1 ? '<div class="divider"></div>' : ''}
+  `).join('');
+
+  container.innerHTML = `
+    <div class="header-card">
+      <div class="report-meta">Helpmate User Feedback · ${DATA.timeframe}</div>
+      <div class="report-title">${DATA.period}</div>
+      <div class="csat-container">
+        <div class="csat-score">${DATA.csat}</div>
+        <div class="csat-meta">
+          <div class="csat-label">Helpmate CSAT</div>
+          ${trendHtml}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top reasons for bad score</div>
+      ${reasonsHtml}
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top issues from free text</div>
+      ${issuesHtml}
+    </div>
+
+    <div class="footer-card">
+      <span class="footer-label">Want the full breakdown?</span>
+      <a href="${DATA.fullReportUrl}" class="full-report-link">View full analysis →</a>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
